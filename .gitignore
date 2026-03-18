@@ -1,0 +1,61 @@
+# --- Unity Default ---
+[Library]
+[Temp]
+[Obj]
+[Build]
+[Builds]
+[Logs]
+[MemoryCaptures]
+/Assets/AssetStoreTools*
+
+# --- Visual Studio / IDE ---
+.vs/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svntmp
+*.pdb
+*.opendb
+*.IDB
+*.db
+*.VC.db
+
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+Network Trash Folder
+Temporary Items
+.Trashes
+
+# --- OS Specific ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- User-Specific ---
+UserSettings/
+Builds/
+/Assets/Plugins/Editor/JetBrains*
+
+# --- Crashlytics/Services ---
+sysinfo.txt
+*.apk
+*.unitypackage
+*.ipa
+
+# --- Xcode (Crucial for your iOS builds) ---
+# We usually don't push the actual Xcode build folder to GitHub, 
+# just the Unity source code.
+/build/
+/Builds/
