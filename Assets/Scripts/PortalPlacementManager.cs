@@ -8,7 +8,7 @@ public class PortalPlacementManager : MonoBehaviour
 {
     [SerializeField] private GameObject portalPrefab; // Assign your Portal Prefab here
     [SerializeField] private GameObject placementIndicator; // Optional: A visual marker for where the portal will land
-    
+
     private ARRaycastManager raycastManager;
     private GameObject spawnedPortal;
     private static List<ARRaycastHit> hits = new List<ARRaycastHit>();
@@ -30,17 +30,23 @@ public class PortalPlacementManager : MonoBehaviour
 
             if (spawnedPortal == null)
             {
-                // Spawn the portal at the hit position, facing the camera
+                // 1. Spawn the portal
                 spawnedPortal = Instantiate(portalPrefab, hitPose.position, hitPose.rotation);
-                
-                // Ensure the portal faces the user
-                Vector3 lookPos = Camera.main.transform.position - spawnedPortal.transform.position;
-                lookPos.y = 0; // Keep the portal upright
-                spawnedPortal.transform.rotation = Quaternion.LookRotation(lookPos);
             }
-            else
+
+            // // 2. Calculate direction from Portal to Camera
+            // Vector3 directionToCamera = Camera.main.transform.position - spawnedPortal.transform.position;
+
+            // // 3. Keep it upright (ignore vertical tilt)
+            // directionToCamera.y = 0;
+
+            // // 4. Point the Portal's FORWARD at the camera
+            // // If it still looks backwards, use: -directionToCamera
+            // spawnedPortal.transform.rotation = Quaternion.LookRotation(directionToCamera);
+
+            // 5. Explicitly move it if it already existed
+            if (spawnedPortal != null)
             {
-                // Reposition the portal if it already exists
                 spawnedPortal.transform.position = hitPose.position;
             }
         }
