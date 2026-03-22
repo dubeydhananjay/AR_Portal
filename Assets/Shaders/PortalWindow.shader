@@ -2,13 +2,14 @@ Shader "Custom/PortalWindow" {
     Properties {
         _Color ("Color", Color) = (1,1,1,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
+        [Enum(Equal, 3, NotEqual, 6)] _StencilTest ("Stencil Test", int) = 6
     }
     SubShader {
         Tags { "RenderType"="Opaque" "Queue"="Geometry" }
 
         Stencil {
             Ref 1
-            Comp Equal
+            Comp [_StencilTest]
         }
 
         CGPROGRAM

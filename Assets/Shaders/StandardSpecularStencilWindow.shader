@@ -38,6 +38,10 @@ Shader "Custom/Standard Specular Stencil Window"
 
         [Enum(UV0,0,UV1,1)] _UVSec ("UV Set for secondary textures", Float) = 0
 
+        //Enum(Equal and Not Equal) for comparison with the portal mask
+        //I set the Equal to 3 and Not Equal to 6 based on the documentation of shader. 
+        [Enum(Equal, 3, NotEqual, 6)] _StencilTest ("Stencil Test", int) = 6
+
 
         // Blending state
         [HideInInspector] _Mode ("__mode", Float) = 0.0
@@ -58,7 +62,7 @@ Shader "Custom/Standard Specular Stencil Window"
         // This ensures the object only draws where the Stencil Buffer is 1
         Stencil {
             Ref 1
-            Comp Equal
+            Comp [_StencilTest]
         }
         // ------------------------------------------------------------------
         //  Base forward pass (directional light, emission, lightmaps, ...)
@@ -229,9 +233,9 @@ Shader "Custom/Standard Specular Stencil Window"
         LOD 300
 
         // This ensures the object only draws where the Stencil Buffer is 1
-        Stencil {
+         Stencil {
             Ref 1
-            Comp Equal
+            Comp [_StencilTest]
         }
 
         // ------------------------------------------------------------------

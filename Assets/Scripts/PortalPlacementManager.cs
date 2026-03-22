@@ -3,52 +3,40 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-[RequireComponent(typeof(ARRaycastManager))]
 public class PortalPlacementManager : MonoBehaviour
 {
-    [SerializeField] private GameObject portalPrefab; // Assign your Portal Prefab here
-    [SerializeField] private GameObject placementIndicator; // Optional: A visual marker for where the portal will land
+    [Header("References")]
+    [SerializeField] private PortalUIController uiController;
 
     private ARRaycastManager raycastManager;
     private GameObject spawnedPortal;
-    private static List<ARRaycastHit> hits = new List<ARRaycastHit>();
+    private List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
-    void Awake()
+    void Awake() => raycastManager = GetComponent<ARRaycastManager>();
+
+    // Get the trackables plane with ar raycastManager and store ar raycast hits
+    // the source point of ray would be (Screen.width / 2, Screen.height / 2)
+    //we will update the text based on the raycast hits and planes found.
+    void Update()
     {
-        raycastManager = GetComponent<ARRaycastManager>();
+        if (raycastManager == null) return;
+        if (spawnedPortal != null) return;
+
+        var screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        bool hitFound = raycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon);
+
+        uiController.UpdateUIState(hitFound, spawnedPortal != null);
     }
 
-    // This method should be called by your "Place Portal" UI Button
+    //Once we have hits, we will place the portal on the first hit we got
+    //this method is added to "Place Portal" button event in UI
     public void TryPlacePortal()
     {
-        // Shoot a ray from the center of the screen
-        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-
-        if (raycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
+        if (hits.Count > 0 && spawnedPortal == null)
         {
-            Pose hitPose = hits[0].pose;
-
-            if (spawnedPortal == null)
-            {
-                // 1. Spawn the portal
-                spawnedPortal = Instantiate(portalPrefab, hitPose.position, hitPose.rotation);
-            }
-
-            // // 2. Calculate direction from Portal to Camera
-            // Vector3 directionToCamera = Camera.main.transform.position - spawnedPortal.transform.position;
-
-            // // 3. Keep it upright (ignore vertical tilt)
-            // directionToCamera.y = 0;
-
-            // // 4. Point the Portal's FORWARD at the camera
-            // // If it still looks backwards, use: -directionToCamera
-            // spawnedPortal.transform.rotation = Quaternion.LookRotation(directionToCamera);
-
-            // 5. Explicitly move it if it already existed
-            if (spawnedPortal != null)
-            {
-                spawnedPortal.transform.position = hitPose.position;
-            }
+            spawnedPortal = Instantiate(raycastManager.raycastPrefab, hits[0].pose.position, hits[0].pose.rotation, null);
+            spawnedPortal.AddComponent<ARAnchor>();
+            uiController.UpdateUIState(false, true);
         }
     }
 }

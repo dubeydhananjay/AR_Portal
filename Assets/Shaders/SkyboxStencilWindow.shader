@@ -12,6 +12,8 @@ Properties {
 
     _Exposure("Exposure", Range(0, 8)) = 1.3
 
+    //Enum(Equal and Not Equal) for comparison with the portal mask
+    //I set the Equal to 3 and Not Equal to 6 based on the documentation of shader. 
     [Enum(Equal, 3, NotEqual, 6)] _StencilTest ("Stencil Test", int) = 6
 }
 
@@ -19,6 +21,7 @@ SubShader {
     Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
     Cull Off ZWrite Off
 
+    // This ensures the object only draws where the Stencil Buffer is 1
      Stencil {
             Ref 1
             Comp [_StencilTest]

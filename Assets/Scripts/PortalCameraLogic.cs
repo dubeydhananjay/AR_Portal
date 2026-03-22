@@ -1,39 +1,36 @@
+
 using UnityEngine;
 using UnityEngine.Rendering;
+using System.Collections.Generic;
 
 public class PortalCameraLogic : MonoBehaviour
 {
-    // List of all materials used INSIDE the portal
-    [SerializeField] private Material[] interiorMaterials;
+    [Header("Portal Settings")]
+    [SerializeField] private List<Material> interiorMaterials = new List<Material>();
 
-    // Called when the camera enters the Doorway trigger
-    private void OnTriggerEnter(Collider other)
+    private const string PORTAL_DOOR = "PortalDoor";
+    private bool isInside = false;
+
+    private void Start()
     {
-        if (other.CompareTag("PortalDoor"))
-        {
-            SetStencilFunction(CompareFunction.Always);
-        }
+        // Mask the environment at the start of the app
+        SetStencilFunction(CompareFunction.Equal);
     }
 
-    // Called when the camera exits the Doorway trigger
-    private void OnTriggerExit(Collider other)
+    //the doorway of the portal is the mask and when the camera and mask intersect trigger is activated
+    //once trigger is activated all the shader masked behind the doorway will have "Not Equal" comparison in stencil shader
+    //i.e all the gameobjects will be drawn or not be masked behind the doorway
+    //And when user again goes through the portal, again the trigger activates and mask the environment by setting the "Equal" comparison.
+    private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PortalDoor"))
-        {
-            // Use the position to determine if we exited to the 'outside' or 'inside'
-            // For simplicity, we check if the camera is in front or behind the door
-            Vector3 relativePos = other.transform.InverseTransformPoint(transform.position);
+        if (!other.CompareTag(PORTAL_DOOR)) return;
 
-            if (relativePos.z < 0) 
-            {
-                // We are outside
-                SetStencilFunction(CompareFunction.Equal);
-            }
-            else 
-            {
-                // We are inside
-                SetStencilFunction(CompareFunction.Always);
-            }
+        isInside = !isInside;
+        if(isInside) {
+            SetStencilFunction(CompareFunction.NotEqual);
+        }
+        else {
+            SetStencilFunction(CompareFunction.Equal);
         }
     }
 
@@ -41,8 +38,11 @@ public class PortalCameraLogic : MonoBehaviour
     {
         foreach (var mat in interiorMaterials)
         {
-            // "_StencilComp" is the standard property name for the Stencil Comparison
-            mat.SetInt("_StencilComp", (int)func);
+            if (mat != null)
+            {
+                // Matches the [Enum] property name in your Specular Stencil shader
+                mat.SetInt("_StencilTest", (int)func);
+            }
         }
     }
 }
